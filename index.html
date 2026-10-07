@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CPU Scheduling Simulator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Operating Systems</p>
+          <h1>CPU Process Scheduling Simulator</h1>
+          <p class="subtitle">Interactive Operating Systems CPU Scheduling Simulator</p>
+        </div>
+      </header>
+
+      <main>
+        <section class="panel intro-panel" aria-labelledby="intro-heading">
+          <div class="section-heading">
+            <p class="section-kicker">Learn by simulation</p>
+            <h2 id="intro-heading">Understand how the CPU chooses its next process</h2>
+          </div>
+          <p>
+            CPU scheduling is the operating system's way of deciding which ready process gets to use the
+            processor next. Scheduling algorithms help share CPU time efficiently and predictably when
+            several processes compete to run.
+          </p>
+          <p>
+            Use this simulator to compare four classic algorithms, follow their execution on a timeline,
+            and see how each scheduling decision affects waiting, turnaround, and response times.
+          </p>
+        </section>
+
+        <section class="learning-section" aria-labelledby="how-it-works-heading">
+          <div class="section-heading">
+            <p class="section-kicker">A quick guide</p>
+            <h2 id="how-it-works-heading">How It Works</h2>
+          </div>
+          <ol class="steps-list">
+            <li><span class="step-number">01</span><span>Add processes and their arrival, burst, and priority values.</span></li>
+            <li><span class="step-number">02</span><span>Select an algorithm; set a time quantum for Round Robin.</span></li>
+            <li><span class="step-number">03</span><span>Run the simulation to schedule the ready processes.</span></li>
+            <li><span class="step-number">04</span><span>View the Gantt chart, including any CPU idle periods.</span></li>
+            <li><span class="step-number">05</span><span>Analyze process results and overall performance metrics.</span></li>
+          </ol>
+        </section>
+
+        <section class="learning-section" aria-labelledby="algorithms-heading">
+          <div class="section-heading">
+            <p class="section-kicker">Scheduling strategies</p>
+            <h2 id="algorithms-heading">Algorithms</h2>
+          </div>
+          <div class="algorithm-grid">
+            <article class="algorithm-card">
+              <span class="algorithm-tag">01 / Arrival order</span>
+              <h3>FCFS</h3>
+              <p>First Come, First Served runs ready processes in the order they arrive.</p>
+              <p class="characteristic"><strong>Key characteristic</strong> Simple and non-preemptive; a long job can make others wait.</p>
+            </article>
+            <article class="algorithm-card">
+              <span class="algorithm-tag">02 / Shortest job</span>
+              <h3>SJF</h3>
+              <p>Shortest Job First selects the available process with the smallest burst time.</p>
+              <p class="characteristic"><strong>Key characteristic</strong> Non-preemptive; can reduce average waiting when short jobs are available.</p>
+            </article>
+            <article class="algorithm-card">
+              <span class="algorithm-tag">03 / Priority value</span>
+              <h3>Priority Scheduling</h3>
+              <p>Runs the ready process with the best priority; in this simulator, a lower value means higher priority.</p>
+              <p class="characteristic"><strong>Key characteristic</strong> Non-preemptive; equal priorities are resolved by arrival, then entry order.</p>
+            </article>
+            <article class="algorithm-card">
+              <span class="algorithm-tag">04 / Time slices</span>
+              <h3>Round Robin</h3>
+              <p>Shares CPU time in turns, giving each ready process up to one time quantum.</p>
+              <p class="characteristic"><strong>Key characteristic</strong> Preemptive and cyclic; the quantum controls the length of each turn.</p>
+            </article>
+          </div>
+        </section>
+
+        <div class="dashboard">
+        <section class="panel input-panel">
+          <h2>Add Process</h2>
+          <form id="process-form" novalidate>
+            <div class="field-grid">
+              <label>
+                <span>Process ID</span>
+                <input id="pid" name="pid" type="text" placeholder="P1" maxlength="10" />
+              </label>
+              <label>
+                <span>Arrival Time</span>
+                <input id="arrival" name="arrival" type="number" min="0" step="any" placeholder="0" />
+              </label>
+              <label>
+                <span>Burst Time</span>
+                <input id="burst" name="burst" type="number" min="0" step="any" placeholder="5" />
+              </label>
+              <label>
+                <span>Priority</span>
+                <input id="priority" name="priority" type="number" min="0" step="any" placeholder="2" />
+                <small>Lower value = higher priority</small>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="primary-btn">Add Process</button>
+              <button type="button" class="secondary-btn" id="reset-processes">Reset</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel control-panel">
+          <h2>Simulation Settings</h2>
+
+          <div class="control-row">
+            <label>
+              <span>Algorithm</span>
+              <select id="algorithm">
+                <option value="FCFS">FCFS</option>
+                <option value="SJF">SJF</option>
+                <option value="Priority">Priority</option>
+                <option value="RR">Round Robin</option>
+              </select>
+            </label>
+
+            <label id="quantum-field" class="hidden">
+              <span>Time Quantum</span>
+              <input id="quantum" type="number" min="0" step="any" value="2" />
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="primary-btn" id="run-simulation">Run Simulation</button>
+          </div>
+
+          <p id="message" class="status-message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel table-panel">
+          <h2>Process List</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Process</th>
+                  <th>Arrival</th>
+                  <th>Burst</th>
+                  <th>Priority</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="process-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="results-heading">
+            <div>
+              <p class="section-kicker">Simulation output</p>
+              <h2>Results</h2>
+            </div>
+            <span class="chart-hint">Timeline blocks are proportional to CPU time</span>
+          </div>
+
+          <h3 class="subsection-title">Gantt Chart</h3>
+          <p class="chart-description">Each block shows a process and its start/end time. Hatched blocks indicate when the CPU is idle.</p>
+          <div class="gantt-wrapper">
+            <div id="gantt-chart" class="gantt-chart" aria-label="CPU execution timeline" aria-live="polite"></div>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="metric-label">Average Waiting Time</span>
+              <strong id="avg-waiting">0.00</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Average Turnaround Time</span>
+              <strong id="avg-turnaround">0.00</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">CPU Utilization</span>
+              <strong id="cpu-utilization">0%</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">Total Time</span>
+              <strong id="total-time">0</strong>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Process</th>
+                  <th>First Start</th>
+                  <th>Completion</th>
+                  <th>Turnaround</th>
+                  <th>Waiting</th>
+                  <th>Response</th>
+                </tr>
+              </thead>
+              <tbody id="results-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+        </div>
+      </main>
+
+      <footer class="site-footer">CPU Process Scheduling Simulator <span aria-hidden="true">|</span> Operating Systems Project</footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
